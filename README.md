@@ -1,7 +1,6 @@
-# conrpt
-Stata package that provides confusion matrix statistics.
-
 ## Introduction
+
+Stata package that provides confusion matrix statistics.
 
 This package was inspired by discussions on statalist.org. See for example:
 
