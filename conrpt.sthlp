@@ -21,7 +21,7 @@
 {synopt:{opt no:legend}}Suppress output of legend which provides a quick reference.{p_end}
 {synopt:{opt ti:tle}}Specify a title to be displayed with the output.{p_end}
 {synopt:{opt no:coin}}Suppres production and output of comparison coins. Default behavior is to produce and display results for random coints which can be used for comparison purposes.{p_end}
-{synopt:{opt prob:s({it:numlist})}}Where [{numlist}] is list of integers in the range of 1 through 100. This option modifies the random coins generated for comparison purposes.{p_end}
+{synopt:{opt prob:s(numlist)}}Where {it:numlist} is list of integers in the range of 1 through 100. This option modifies the random coins generated for comparison purposes.{p_end}
 {synopt:{opt perfect}}Generates a column of statistics for a test that perfectly matches the reference variable. Intended for testing purposes.{p_end}
 {synopt:{opt mat:rix}}Provide a name for the matrix.{p_end}
 
@@ -63,7 +63,7 @@ Referenced / Observed Variable : var1
 {title:Example}
 
 {phang}{cmd:. clear all}{p_end}
-{phang}{cmd:. set obs 1000{p_end}
+{phang}{cmd:. set obs 1000}{p_end}
 {phang}{cmd:. gen reference_var = round(runiform(0,1))}{p_end}
 {phang}{cmd:. gen fst_predict = reference_var}{p_end}
 {phang}{cmd:. replace fst_predict = 1 if _n > 800}{p_end}
