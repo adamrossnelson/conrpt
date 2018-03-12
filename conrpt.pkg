@@ -1,0 +1,9 @@
+d conrpt: Stata package that provides confusion matrix statistics.
+d
+d Distribution-Date: March 2018
+d
+d Author:  Adam Ross Nelson
+d Support: https://github.com/adamrossnelson/conrpt
+d
+f conrpt.ado
+f conrpt.sthlp
