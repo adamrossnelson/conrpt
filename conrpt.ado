@@ -9,15 +9,14 @@ program define conrpt, rclass byable(recall)
 	version 15
 	preserve
 
-	// Syntax statement limits first argument to variable name which must be
-	// binary. Subsequent arguments varlist of one or more vars which also must
-	// be binary. Includes support for if and in qualifiers.
+	// Syntax statement limits first argument to variable name which 
+	// must be binary. Subsequent vars in varlist must be binary.
 	syntax varlist(min=2 numeric) [if] [in] ///
 	[,noPRINT noCOIN noLEGEND perfect ///
 	title(string) PROBs(string asis) ///
 	MATrix(string)]
 	
-	local sp char(13) char(10) // Define spacer.
+	local sp char(13) char(10)                      // Define spacer.
 
 	// Test number of arguments. Must be at least two.
 	local nvar : word count `varlist'
@@ -33,12 +32,7 @@ program define conrpt, rclass byable(recall)
 			error 452
 		}
 	}
-	// Test that coin option correction specified
-	if "`coin'" != "" & "`coin'" != "nocoin" {
-		di as error "ERROR: Coin option incorrectly specified."
-		errir 198
-	}
-	// Test that coin and probs not both specified
+	// Test that coin and probs not both specified.
 	if "`coin'" == "nocoin" & "`probs'" != ""{
 		di as error "ERROR: Nocoin option may not be combined with probs option."
 		error 198
@@ -227,7 +221,7 @@ program define conrpt, rclass byable(recall)
 		}
 	}
 	
-	di "{it:   - conrpt - }Command was a success."
+	di as result "{it:   - conrpt - }Command was a success."
 
 	if "`matrix'" != "" {
 		matrix `matrix' = `rmat'
