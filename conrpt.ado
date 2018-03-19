@@ -192,17 +192,17 @@ program define conrpt, rclass byable(recall)
 		di ""
 
 		if strlen("`varlist3'") * 2 > 81 {
-			di "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'"
+			di as result "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'"
 		}
 		else if strlen("`varlist3'") * 2 < 71 & strlen("`varlist3'") * 2 > 34 {
-			di "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & "
-			di "   ObservedTot: `ObservedTot', Prevalence: `Prevalence'"
+			di as result  "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & "
+			di as result "   ObservedTot: `ObservedTot', Prevalence: `Prevalence'"
 		}
 		else if strlen("`varlist3'") * 2 < 35 {
-			di "   Notes: ObservedPos: `ObservedPos',"
-			di "   ObservedNeg: `ObservedNeg', & "
-			di "   ObservedTot: `ObservedTot',"
-			di "   Prevalence: `Prevalence'"
+			di as result "   Notes: ObservedPos: `ObservedPos',"
+			di as result "   ObservedNeg: `ObservedNeg', & "
+			di as result "   ObservedTot: `ObservedTot',"
+			di as result "   Prevalence: `Prevalence'"
 		}
 
 		if "`legend'" != "nolegend" {
