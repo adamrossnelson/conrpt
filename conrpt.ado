@@ -14,7 +14,7 @@ program define conrpt, rclass byable(recall)
 	syntax varlist(min=2 numeric) [if] [in] ///
 	[,noPRINT noCOIN noLEGEND perfect ///
 	title(string) PROBs(string asis) ///
-	MATrix(string)]
+	MATrix(string)] PDX
 	
 	local sp char(13) char(10)                      // Define spacer.
 
@@ -36,6 +36,13 @@ program define conrpt, rclass byable(recall)
 	if "`coin'" == "nocoin" & "`probs'" != ""{
 		di as error "ERROR: Nocoin option may not be combined with probs option."
 		error 198
+	}
+	// If pdx option given, test if there is an active putdocx.
+	capture putdocx describe
+	if _rc {
+		di in smcl as error "ERROR: No active docx, pdx option must be in"
+		di in smcl as error "context an active putdocx."
+		exit = 119
 	}
 
 	// Tag subsample with temp var touse & test if empty.
@@ -225,6 +232,10 @@ program define conrpt, rclass byable(recall)
 
 	if "`matrix'" != "" {
 		matrix `matrix' = `rmat'
+	}
+
+	if "`pdx'" == "pdx" {
+		 putdocx table tablename = matrix(`rmat'), nformat(%6.5g) rownames colnames
 	}
 
 	return matrix rmat = `rmat'              // Return matrix
