@@ -14,7 +14,7 @@ program define conrpt, rclass byable(recall)
 	syntax varlist(min=2 numeric) [if] [in] ///
 	[,noPRINT noCOIN noLEGEND perfect ///
 	title(string) PROBs(string asis) ///
-	MATrix(string)] PDX
+	MATrix(string) PDX]
 	
 	local sp char(13) char(10)                      // Define spacer.
 
