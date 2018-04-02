@@ -8,7 +8,7 @@ program define conrpt, rclass byable(recall)
 	// Version control
 	version 15
 	preserve
-
+	
 	// Syntax statement limits first argument to variable name which 
 	// must be binary. Subsequent vars in varlist must be binary.
 	syntax varlist(min=2 numeric) [if] [in] ///
@@ -16,8 +16,9 @@ program define conrpt, rclass byable(recall)
 	title(string) PROBs(string asis) ///
 	MATrix(string) PDX]
 	
-	local sp char(13) char(10)                      // Define spacer.
-
+	local sp char(13) char(10)      // Define double spacer.
+	local sl char(13)               // Define line return.
+	
 	// Test number of arguments. Must be at least two.
 	local nvar : word count `varlist'
 	if `nvar' < 2 {
@@ -39,9 +40,9 @@ program define conrpt, rclass byable(recall)
 	}
 	// If pdx option given, test if there is an active putdocx.
 	capture putdocx describe
-	if _rc {
+	if _rc & "`pdx'" == "pdx" {
 		di in smcl as error "ERROR: No active docx, pdx option must be in"
-		di in smcl as error "context an active putdocx."
+		di in smcl as error "       context an active putdocx."
 		exit = 119
 	}
 
@@ -212,30 +213,36 @@ program define conrpt, rclass byable(recall)
 			di as result "   Prevalence: `Prevalence'"
 		}
 
+		// Build legend text.
+		local legtext "" `sl' ///
+		"   {ul:Keywords, Terminology, & Calculations - Quick References}" `sp' ///
+		"   Prevalence  = ObservedPos/ObservedTot" `sl' ///
+		"   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos" `sl' ///
+		"   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)" `sl' ///
+		"   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = (FalseNeg/(FalseNeg+TruePos))" `sl' ///
+		"   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot" `sp' ///
+		"   FalsePos    = Type I Error                  FalseNeg    = Type II Error" `sl' ///
+		"   FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity" `sl' ///
+		""
+
 		if "`legend'" != "nolegend" {
-			di ""
-			di "   {ul:Keywords, Terminology, & Calculations - Quick References}"
-			di ""
-			di "   Prevalence  = ObservedPos/ObservedTot"
-			di "   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos"
-			di "   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)"
-			di "   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = (FalseNeg/(FalseNeg+TruePos))"
-			di "   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot"
-			di ""
-			di "   FalsePos    = Type I Error                  FalseNeg    = Type II Error"
-			di "   FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity"
-			di ""
+			di "`legtext'"
 		}
 	}
 	
-	di as result "{it:   - conrpt - }Command was a success."
-
 	if "`matrix'" != "" {
 		matrix `matrix' = `rmat'
 	}
-
+	
 	if "`pdx'" == "pdx" {
-		 putdocx table tablename = matrix(`rmat'), nformat(%6.5g) rownames colnames
+		putdocx table tablename = matrix(`rmat'), nformat(%6.5g) rownames colnames
+		if "`legend'" != "nolegend" {
+			local legtext = subinstr("`legtext'","{ul:","",.)
+			local legtext = subinstr("`legtext'","}","",.)
+			putdocx paragraph
+			putdocx text ("`legtext'")
+			di "`legtext'"
+		}
 	}
 
 	return matrix rmat = `rmat'              // Return matrix
@@ -243,5 +250,7 @@ program define conrpt, rclass byable(recall)
 	return local testnames `varlist2'        // Return test variables
 	return local obsvar `1'                  // Return observed variable
 	restore
+
+	di as result "{it:   - conrpt - }Command was a success."
 end
 
