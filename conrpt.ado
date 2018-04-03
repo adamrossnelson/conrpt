@@ -212,7 +212,7 @@ program define conrpt, rclass byable(recall)
 			di "   Prevalence  = ObservedPos/ObservedTot"
 			di "   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos"
 			di "   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)"
-			di "   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = (FalseNeg/(FalseNeg+TruePos))"
+			di "   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = FalseNeg/(FalseNeg+TruePos)"
 			di "   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot"
 			di ""
 			di "   FalsePos    = Type I Error                  FalseNeg    = Type II Error"
