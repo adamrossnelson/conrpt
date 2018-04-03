@@ -63,6 +63,7 @@ Referenced / Observed Variable : var1
 {title:Example}
 
 {phang}{cmd:. clear all}{p_end}
+{phang}{cmd:. set seed 1234}{p_end}
 {phang}{cmd:. set obs 1000}{p_end}
 {phang}{cmd:. gen reference_var = round(runiform(0,1))}{p_end}
 {phang}{cmd:. gen fst_predict = reference_var}{p_end}

@@ -140,7 +140,7 @@ program define conrpt, rclass byable(recall)
 			local FalsePosRt : di %-6.2f (`FalsePos' / `ObservedNeg')              * 100
 			matrix `rmat'[12,`i'] = `FalsePosRt'
 			// FalseNegRt aka Inverse Sensitivity               // (FalseNeg/(FalseNeg+TruePos))
-			local FalseNegRt : di %-8.2f (`FalseNeg' / `ObservedNeg')              * 100
+			local FalseNegRt : di %-8.2f (`FalseNeg' / `ObservedPos')              * 100
 			matrix `rmat'[13,`i'] = `FalseNegRt'
 
 			// CorrectRt aka Accuracy                           // (TruePos+TrueNeg)/TestedTot
