@@ -206,7 +206,7 @@ program define conrpt, rclass byable(recall)
 		}
 
 		if "`legend'" != "nolegend" {
-			di ""
+			di as text ""
 			di "   {ul:Keywords, Terminology, & Calculations - Quick References}"
 			di ""
 			di "   Prevalence  = ObservedPos/ObservedTot"
