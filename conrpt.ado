@@ -124,30 +124,30 @@ program define conrpt, rclass byable(recall)
 			local FalseNeg = r(N)
 			
 			// Sensitivity aka true positive rate (TPR)         // (TruePos/ObservedPos)
-			local Sensitivity : di %-6.2f (`TruePos' / `ObservedPos')                   * 100
+			local Sensitivity : di %-6.2f (`TruePos' / `ObservedPos')              * 100
 			matrix `rmat'[8,`i'] = `Sensitivity'
 			// Specificity aka true negative rate (TNR)         // (TrueNeg/ObservedNeg)
-			local Specificity : di %-6.2f (`TrueNeg' / `ObservedNeg')                   * 100
+			local Specificity : di %-6.2f (`TrueNeg' / `ObservedNeg')              * 100
 			matrix `rmat'[9,`i'] = `Specificity'
 
 			// PosPredVal aka precision                         // (TruePos/(TruePos+FalsePos))
-			local PosPredVal : di %-6.2f (`TruePos' / (`TruePos' + `FalsePos'))          * 100
+			local PosPredVal : di %-6.2f (`TruePos' / (`TruePos' + `FalsePos'))    * 100
 			matrix `rmat'[10,`i'] = `PosPredVal'
 			// NegPredVal aka ...                               // (TrueNeg/(TrueNeg+FalseNeg))
-			local NegPredVal : di %-6.2f (`TrueNeg' / (`TrueNeg' + `FalseNeg'))         * 100
+			local NegPredVal : di %-6.2f (`TrueNeg' / (`TrueNeg' + `FalseNeg'))    * 100
 			matrix `rmat'[11,`i'] = `NegPredVal'
 			// FalsePosRt aka Inverse Specificity or fall-out   // (FalsePos/ObservedNeg)
-			local FalsePosRt : di %-6.2f (`FalsePos' / `ObservedNeg')                   * 100
+			local FalsePosRt : di %-6.2f (`FalsePos' / `ObservedNeg')              * 100
 			matrix `rmat'[12,`i'] = `FalsePosRt'
 			// FalseNegRt aka Inverse Sensitivity               // (FalseNeg/(FalseNeg+TruePos))
-			local FalseNegRt : di %-8.2f (`FalseNeg' / (`FalseNeg' + `TruePos'))        * 100
+			local FalseNegRt : di %-8.2f (`FalseNeg' / `ObservedNeg')              * 100
 			matrix `rmat'[13,`i'] = `FalseNegRt'
 
 			// CorrectRt aka Accuracy                           // (TruePos+TrueNeg)/TestedTot
-			local CorrectRt : di %-6.2f (`TruePos' + `TrueNeg') / `TestedTot'           * 100
+			local CorrectRt : di %-6.2f (`TruePos' + `TrueNeg') / `TestedTot'      * 100
 			matrix `rmat'[14,`i'] = `CorrectRt'
 			// IncorrectRt                                      // (FalsePos+FalseNeg)/TestedTot
-			local IncorrectRt : di %-6.2f (`FalsePos' + `FalseNeg') / `TestedTot'       * 100
+			local IncorrectRt : di %-6.2f (`FalsePos' + `FalseNeg') / `TestedTot'  * 100
 			matrix `rmat'[15,`i'] = `IncorrectRt'
 			
 			// ROCArea
@@ -212,7 +212,7 @@ program define conrpt, rclass byable(recall)
 			di "   Prevalence  = ObservedPos/ObservedTot"
 			di "   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos"
 			di "   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)"
-			di "   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = FalseNeg/(FalseNeg+TruePos)"
+			di "   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = FalseNeg/ObservedPos"
 			di "   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot"
 			di ""
 			di "   FalsePos    = Type I Error                  FalseNeg    = Type II Error"
