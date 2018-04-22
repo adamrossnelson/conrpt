@@ -202,6 +202,7 @@ program define conrpt, rclass byable(recall)
 		matlist `rmat'
 		di ""
 
+		// TODO: Define the notes line as a local for later display to screen and/or to putdocx/
 		if strlen("`varlist3'") * 2 > 81 {
 			di as result "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'"  `sl'
 		}
@@ -223,14 +224,29 @@ program define conrpt, rclass byable(recall)
 		"FINALLY A LAST LINE"
 
 		// Build legend text.
-		scalar legtext_file = fileread("conrptlegtext.txt")
-		scalar legtext_sc_header = "   {ul:Keywords, Terminology, & Calculations - Quick References}"
+		local legtext "   Prevalence  = ObservedPos/ObservedTot`spp'" ///
+		"   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos`spp'" ///
+		"   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)`spp'" ///
+		"   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = (FalseNeg/(FalseNeg+TruePos))`spp'" ///
+		"   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot`spp'" ///
+		"`spp'" ///
+		"   FalsePos    = Type I Error                  FalseNeg    = Type II Error`spp'" ///
+		"   FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity`spp'" ///
+		""
+
+
+		// Build legend text.
+		// scalar legtext_file = fileread("conrptlegtext.txt")
+		local legtext_sc_header = "   {ul:Keywords, Terminology, & Calculations - Quick References}"
 		scalar legtext_fl_header = "Keywords, Terminology, & Calculations - Quick References"
 		scalar legtext_screen = "`=legtext_sc_header + legtext_file'"
 		// scalar legtext_to_file = "`=legtext_fl_header + legtext_file'"
 
 		if "`legend'" != "nolegend" {
-			di as text legtext_screen
+			di as text "`legtext_sc_header'" `spp'
+			foreach line in "`legtext'" {
+				di subinstr("`line'","`spp'","",.)
+			}
 		}
 	}
 	
@@ -241,14 +257,12 @@ program define conrpt, rclass byable(recall)
 	
 	if "`pdx'" == "pdx" {
 		putdocx table tablename = matrix(`rmat'), nformat(%6.5g) rownames colnames
-		
 		if "`legend'" != "nolegend" {
-			putdocx paragraph, font(Consolas)
+			putdocx paragraph, font(Consolas, 8)
 			putdocx text ("`=legtext_fl_header'"), linebreak underline
-			foreach line in "`multiliner'" {
+			foreach line in "`legtext'" {
 				putdocx text (subinstr("`line'","`spp'","",.)), linebreak
 			}
-			// putdocx text (fileread("conrptlegtext.txt"))
 		}
 	}
 	
