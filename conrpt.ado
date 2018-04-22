@@ -16,6 +16,7 @@ program define conrpt, rclass byable(recall)
 	title(string) PROBs(string asis) ///
 	MATrix(string) PDX]
 	
+	local spp char(10)
 	local sp char(13) char(10)      // Define double spacer.
 	local sl char(13)               // Define line return.
 	
@@ -39,11 +40,13 @@ program define conrpt, rclass byable(recall)
 		error 198
 	}
 	// If pdx option given, test if there is an active putdocx.
-	capture putdocx describe
-	if _rc & "`pdx'" == "pdx" {
-		di in smcl as error "ERROR: No active docx, pdx option must be in"
-		di in smcl as error "       context an active putdocx."
-		exit = 119
+	if "`pdx'" == "pdx" {
+		capture putdocx describe
+		if _rc {
+			di in smcl as error "ERROR: No active docx, pdx option must be in the"
+			di in smcl as error "       context of an active putdocx."
+			exit = 119
+		}
 	}
 
 	// Tag subsample with temp var touse & test if empty.
@@ -200,57 +203,61 @@ program define conrpt, rclass byable(recall)
 		di ""
 
 		if strlen("`varlist3'") * 2 > 81 {
-			di as result "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'"
+			di as result "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'"  `sl'
 		}
 		else if strlen("`varlist3'") * 2 < 71 & strlen("`varlist3'") * 2 > 34 {
 			di as result  "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & "
-			di as result "   ObservedTot: `ObservedTot', Prevalence: `Prevalence'"
+			di as result "   ObservedTot: `ObservedTot', Prevalence: `Prevalence'"  `sl'
 		}
 		else if strlen("`varlist3'") * 2 < 35 {
 			di as result "   Notes: ObservedPos: `ObservedPos',"
 			di as result "   ObservedNeg: `ObservedNeg', & "
 			di as result "   ObservedTot: `ObservedTot',"
-			di as result "   Prevalence: `Prevalence'"
+			di as result "   Prevalence: `Prevalence'"  `sl'
 		}
 
+		// Build multiline test string.
+		local multiliner "THIS WILL BE MULTIPLE LINES`spp'" ///
+		"HERE IS A SECOND LINE OF TEXT`spp'" ///
+		"AND NOW A THIRD LINE OF TEXT`spp'" ///
+		"FINALLY A LAST LINE"
+
 		// Build legend text.
-		local legtext "" `sl' ///
-		"   {ul:Keywords, Terminology, & Calculations - Quick References}" `sp' ///
-		"   Prevalence  = ObservedPos/ObservedTot" `sl' ///
-		"   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos" `sl' ///
-		"   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)" `sl' ///
-		"   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = (FalseNeg/(FalseNeg+TruePos))" `sl' ///
-		"   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot" `sp' ///
-		"   FalsePos    = Type I Error                  FalseNeg    = Type II Error" `sl' ///
-		"   FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity" `sl' ///
-		""
+		scalar legtext_file = fileread("conrptlegtext.txt")
+		scalar legtext_sc_header = "   {ul:Keywords, Terminology, & Calculations - Quick References}"
+		scalar legtext_fl_header = "Keywords, Terminology, & Calculations - Quick References"
+		scalar legtext_screen = "`=legtext_sc_header + legtext_file'"
+		// scalar legtext_to_file = "`=legtext_fl_header + legtext_file'"
 
 		if "`legend'" != "nolegend" {
-			di as text"`legtext'"
+			di as text legtext_screen
 		}
 	}
 	
+	// If matrix option not specified let the matrix name be rmat.
 	if "`matrix'" != "" {
 		matrix `matrix' = `rmat'
 	}
 	
 	if "`pdx'" == "pdx" {
 		putdocx table tablename = matrix(`rmat'), nformat(%6.5g) rownames colnames
+		
 		if "`legend'" != "nolegend" {
-			local legtext = subinstr("`legtext'","{ul:","",.)
-			local legtext = subinstr("`legtext'","}","",.)
-			putdocx paragraph
-			putdocx text ("`legtext'")
-			di "`legtext'"
+			putdocx paragraph, font(Consolas)
+			putdocx text ("`=legtext_fl_header'"), linebreak underline
+			foreach line in "`multiliner'" {
+				putdocx text (subinstr("`line'","`spp'","",.)), linebreak
+			}
+			// putdocx text (fileread("conrptlegtext.txt"))
 		}
 	}
-
+	
 	return matrix rmat = `rmat'              // Return matrix
 	return local varnames `varlist'          // Return full varlist
 	return local testnames `varlist2'        // Return test variables
 	return local obsvar `1'                  // Return observed variable
 	restore
 
-	di as result "{it:   - conrpt - }Command was a success."
+	di as result "{it:- conrpt - }Command was a success."
 end
 

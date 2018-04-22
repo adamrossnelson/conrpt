@@ -1,0 +1,11 @@
+
+
+   Prevalence  = ObservedPos/ObservedTot
+   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos
+   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)
+   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = (FalseNeg/(FalseNeg+TruePos))
+   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot
+
+   FalsePos    = Type I Error                  FalseNeg    = Type II Error
+   FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity
+   
