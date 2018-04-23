@@ -14,7 +14,7 @@ net install conrpt, from(https://raw.githubusercontent.com/adamrossnelson/conrpt
 
 ## Example & Test Script
 
-To run a version from Stata's command line:
+To run a version of this test script from Stata's command line:
 ```
 do https://raw.githubusercontent.com/adamrossnelson/conrpt/master/conrpttester.do
 ```

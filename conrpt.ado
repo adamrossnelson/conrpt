@@ -1,3 +1,4 @@
+*! 1.0.2 Adam Ross Nelson April2017 // Added pdx option
 *! 1.0.0 Adam Ross Nelson March2018 // Original version
 *! Original author : Adam Ross Nelson
 *! Description     : Stata package that provides confusion matrix statistics.
@@ -202,26 +203,28 @@ program define conrpt, rclass byable(recall)
 		matlist `rmat'
 		di ""
 
-		// TODO: Define the notes line as a local for later display to screen and/or to putdocx/
+		// Define the notes line as a local for later display to screen and/or to putdocx.
 		if strlen("`varlist3'") * 2 > 81 {
-			di as result "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'"  `sl'
+			local observed_results "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'`spp'" ///
+			""
 		}
-		else if strlen("`varlist3'") * 2 < 71 & strlen("`varlist3'") * 2 > 34 {
-			di as result  "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & "
-			di as result "   ObservedTot: `ObservedTot', Prevalence: `Prevalence'"  `sl'
+		else if strlen("`varlist3'") * 2 < 82 & strlen("`varlist3'") * 2 > 34 {
+			local observed_results "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & `spp'" ///
+			"   ObservedTot: `ObservedTot', Prevalence: `Prevalence'`spp'" ///
+			""
 		}
 		else if strlen("`varlist3'") * 2 < 35 {
-			di as result "   Notes: ObservedPos: `ObservedPos',"
-			di as result "   ObservedNeg: `ObservedNeg', & "
-			di as result "   ObservedTot: `ObservedTot',"
-			di as result "   Prevalence: `Prevalence'"  `sl'
+			local observed_results "   Notes: ObservedPos: `ObservedPos',`spp'" ///
+			"   ObservedNeg: `ObservedNeg', & `spp'" ///
+			"   ObservedTot: `ObservedTot',`spp'" ///
+			"   Prevalence: `Prevalence'`spp'" ///
+			""
 		}
 
-		// Build multiline test string.
-		local multiliner "THIS WILL BE MULTIPLE LINES`spp'" ///
-		"HERE IS A SECOND LINE OF TEXT`spp'" ///
-		"AND NOW A THIRD LINE OF TEXT`spp'" ///
-		"FINALLY A LAST LINE"
+		// Print the observed results
+		foreach line in "`observed_results'" {
+			di as result subinstr("`line'","`spp'","",.)
+		}
 
 		// Build legend text.
 		local legtext "   Prevalence  = ObservedPos/ObservedTot`spp'" ///
@@ -233,15 +236,10 @@ program define conrpt, rclass byable(recall)
 		"   FalsePos    = Type I Error                  FalseNeg    = Type II Error`spp'" ///
 		"   FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity`spp'" ///
 		""
-
-
-		// Build legend text.
-		// scalar legtext_file = fileread("conrptlegtext.txt")
+		
 		local legtext_sc_header = "   {ul:Keywords, Terminology, & Calculations - Quick References}"
 		scalar legtext_fl_header = "Keywords, Terminology, & Calculations - Quick References"
-		scalar legtext_screen = "`=legtext_sc_header + legtext_file'"
-		// scalar legtext_to_file = "`=legtext_fl_header + legtext_file'"
-
+		
 		if "`legend'" != "nolegend" {
 			di as text "`legtext_sc_header'" `spp'
 			foreach line in "`legtext'" {
@@ -257,8 +255,12 @@ program define conrpt, rclass byable(recall)
 	
 	if "`pdx'" == "pdx" {
 		putdocx table tablename = matrix(`rmat'), nformat(%6.5g) rownames colnames
+		putdocx paragraph, font(Consolas, 8)
+		foreach line in "`observed_results'" {
+			putdocx text (subinstr(subinstr("`line'","`spp'","",.),"   ","",.)), linebreak
+		}
 		if "`legend'" != "nolegend" {
-			putdocx paragraph, font(Consolas, 8)
+			// putdocx paragraph, font(Consolas, 8)
 			putdocx text ("`=legtext_fl_header'"), linebreak underline
 			foreach line in "`legtext'" {
 				putdocx text (subinstr("`line'","`spp'","",.)), linebreak
