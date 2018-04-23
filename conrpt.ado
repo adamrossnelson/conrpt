@@ -1,3 +1,4 @@
+*! 1.0.2 Adam Ross Nelson April2017 // Added pdx option
 *! 1.0.0 Adam Ross Nelson March2018 // Original version
 *! Original author : Adam Ross Nelson
 *! Description     : Stata package that provides confusion matrix statistics.
@@ -8,16 +9,18 @@ program define conrpt, rclass byable(recall)
 	// Version control
 	version 15
 	preserve
-
+	
 	// Syntax statement limits first argument to variable name which 
 	// must be binary. Subsequent vars in varlist must be binary.
 	syntax varlist(min=2 numeric) [if] [in] ///
 	[,noPRINT noCOIN noLEGEND perfect ///
 	title(string) PROBs(string asis) ///
-	MATrix(string)]
+	MATrix(string) PDX]
 	
-	local sp char(13) char(10)                      // Define spacer.
-
+	local spp char(10)
+	local sp char(13) char(10)      // Define double spacer.
+	local sl char(13)               // Define line return.
+	
 	// Test number of arguments. Must be at least two.
 	local nvar : word count `varlist'
 	if `nvar' < 2 {
@@ -36,6 +39,15 @@ program define conrpt, rclass byable(recall)
 	if "`coin'" == "nocoin" & "`probs'" != ""{
 		di as error "ERROR: Nocoin option may not be combined with probs option."
 		error 198
+	}
+	// If pdx option given, test if there is an active putdocx.
+	if "`pdx'" == "pdx" {
+		capture putdocx describe
+		if _rc {
+			di in smcl as error "ERROR: No active docx, pdx option must be in the"
+			di in smcl as error "       context of an active putdocx."
+			exit = 119
+		}
 	}
 
 	// Tag subsample with temp var touse & test if empty.
@@ -191,46 +203,77 @@ program define conrpt, rclass byable(recall)
 		matlist `rmat'
 		di ""
 
+		// Define the notes line as a local for later display to screen and/or to putdocx.
 		if strlen("`varlist3'") * 2 > 81 {
-			di as result "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'"
+			local observed_results "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & ObservedTot: `ObservedTot', Prevalence: `Prevalence'`spp'" ///
+			""
 		}
-		else if strlen("`varlist3'") * 2 < 71 & strlen("`varlist3'") * 2 > 34 {
-			di as result  "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & "
-			di as result "   ObservedTot: `ObservedTot', Prevalence: `Prevalence'"
+		else if strlen("`varlist3'") * 2 < 82 & strlen("`varlist3'") * 2 > 34 {
+			local observed_results "   Notes: ObservedPos: `ObservedPos', ObservedNeg: `ObservedNeg', & `spp'" ///
+			"   ObservedTot: `ObservedTot', Prevalence: `Prevalence'`spp'" ///
+			""
 		}
 		else if strlen("`varlist3'") * 2 < 35 {
-			di as result "   Notes: ObservedPos: `ObservedPos',"
-			di as result "   ObservedNeg: `ObservedNeg', & "
-			di as result "   ObservedTot: `ObservedTot',"
-			di as result "   Prevalence: `Prevalence'"
+			local observed_results "   Notes: ObservedPos: `ObservedPos',`spp'" ///
+			"   ObservedNeg: `ObservedNeg', & `spp'" ///
+			"   ObservedTot: `ObservedTot',`spp'" ///
+			"   Prevalence: `Prevalence'`spp'" ///
+			""
 		}
 
+		// Print the observed results
+		foreach line in "`observed_results'" {
+			di as result subinstr("`line'","`spp'","",.)
+		}
+
+		// Build legend text.
+		local legtext "   Prevalence  = ObservedPos/ObservedTot`spp'" ///
+		"   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos`spp'" ///
+		"   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)`spp'" ///
+		"   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = (FalseNeg/(FalseNeg+TruePos))`spp'" ///
+		"   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot`spp'" ///
+		"`spp'" ///
+		"   FalsePos    = Type I Error                  FalseNeg    = Type II Error`spp'" ///
+		"   FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity`spp'" ///
+		""
+		
+		local legtext_sc_header = "   {ul:Keywords, Terminology, & Calculations - Quick References}"
+		scalar legtext_fl_header = "Keywords, Terminology, & Calculations - Quick References"
+		
 		if "`legend'" != "nolegend" {
-			di as text ""
-			di "   {ul:Keywords, Terminology, & Calculations - Quick References}"
-			di ""
-			di "   Prevalence  = ObservedPos/ObservedTot"
-			di "   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos"
-			di "   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)"
-			di "   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = FalseNeg/ObservedPos"
-			di "   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot"
-			di ""
-			di "   FalsePos    = Type I Error                  FalseNeg    = Type II Error"
-			di "   FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity"
-			di ""
+			di as text "`legtext_sc_header'" `spp'
+			foreach line in "`legtext'" {
+				di subinstr("`line'","`spp'","",.)
+			}
 		}
 	}
 	
-	di as result "{it:   - conrpt - }Command was a success."
-
+	// If matrix option not specified let the matrix name be rmat.
 	if "`matrix'" != "" {
 		matrix `matrix' = `rmat'
 	}
-
+	
+	if "`pdx'" == "pdx" {
+		putdocx table tablename = matrix(`rmat'), nformat(%6.5g) rownames colnames
+		putdocx paragraph, font(Consolas, 8)
+		foreach line in "`observed_results'" {
+			putdocx text (subinstr(subinstr("`line'","`spp'","",.),"   ","",.)), linebreak
+		}
+		if "`legend'" != "nolegend" {
+			// putdocx paragraph, font(Consolas, 8)
+			putdocx text ("`=legtext_fl_header'"), linebreak underline
+			foreach line in "`legtext'" {
+				putdocx text (subinstr("`line'","`spp'","",.)), linebreak
+			}
+		}
+	}
+	
 	return matrix rmat = `rmat'              // Return matrix
 	return local varnames `varlist'          // Return full varlist
 	return local testnames `varlist2'        // Return test variables
 	return local obsvar `1'                  // Return observed variable
 	restore
+
+	di as result "{it:- conrpt - }Command was a success."
 end
 

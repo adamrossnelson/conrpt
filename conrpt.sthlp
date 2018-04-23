@@ -24,6 +24,7 @@
 {synopt:{opt prob:s(numlist)}}Where {it:numlist} is list of integers in the range of 1 through 100. This option modifies the random coins generated for comparison purposes.{p_end}
 {synopt:{opt perfect}}Generates a column of statistics for a test that perfectly matches the reference variable. Intended for testing purposes.{p_end}
 {synopt:{opt mat:rix}}Provide a name for the matrix.{p_end}
+{synopt:{opt pdx}}Put the command's output in an active putdocx.{p_end}
 
 {marker description}
 {title:Description}
