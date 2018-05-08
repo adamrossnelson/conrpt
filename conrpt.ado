@@ -230,7 +230,7 @@ program define conrpt, rclass byable(recall)
 		local legtext "   Prevalence  = ObservedPos/ObservedTot`spp'" ///
 		"   Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos`spp'" ///
 		"   PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)`spp'" ///
-		"   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = (FalseNeg/(FalseNeg+TruePos))`spp'" ///
+		"   FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = FalseNeg/(FalseNeg+TruePos)`spp'" ///
 		"   CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot`spp'" ///
 		"`spp'" ///
 		"   FalsePos    = Type I Error                  FalseNeg    = Type II Error`spp'" ///
