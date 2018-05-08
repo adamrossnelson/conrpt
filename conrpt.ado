@@ -1,4 +1,4 @@
-*! 1.0.2 Adam Ross Nelson April2017 // Added pdx option
+*! 1.0.2 Adam Ross Nelson April2018 // Added pdx option
 *! 1.0.0 Adam Ross Nelson March2018 // Original version
 *! Original author : Adam Ross Nelson
 *! Description     : Stata package that provides confusion matrix statistics.
