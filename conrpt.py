@@ -7,35 +7,14 @@ def conrpt(rvar, tvar):
     from pandas import DataFrame
     import pandas
 
-    print('Printing rvar')
-    print(rvar)
-
-    print('Printing tvar')
-    print(tvar)
-
-    # df = DataFrame(rvar, tvar, columns=['rvar','tvar'])
-    # df = pandas.merge(rvar, tvar, how='outer')
     df = pandas.concat([rvar.to_frame(), tvar.to_frame()], 
        axis=1, ignore_index=True)
     df.columns = ['rvar','tvar']
 
-    # df = DataFrame(rvar.to_frame(), tvar.to_frame(), columns=['rvar','tvar'])
-
-    print('Printing df')
-    print(df)
-
     df_xtab = pandas.crosstab(df['rvar'], df['tvar'])
 
-    print('printing df_xtab')
-    print(df_xtab)
-
-    # print(df['rvar'].isin([1,0]).all())
-    # print(df['tvar'].isin([1,0]).all())
-
     # Test that arguments are binary
-    # if not (df['rvar'].isin([1,0]).all()) or not (df['tvar'].isin([1,0]).all()):
-    # if ((df['rvar'].isin([1,0]).all() is not True) or (df['tvar'].isin([1,0]).all() is not True)):
-    if 10 == 11:
+    if not (df['rvar'].isin([1,0]).all()) or not (df['tvar'].isin([1,0]).all()):    
         raise ValueError('Variables must be binary.')
 
     # Count true positive results
