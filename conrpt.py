@@ -6,15 +6,30 @@
 # Pass into this function :
 #      First argument, a series that represents observed references.
 #      Second argument, a list of series that represents one or more test results.
-def conrpt(df):
+def conrpt(df, coins=[25,50,75]):
     from pandas import DataFrame
     import pandas
+    import numpy
     import math
-
+    
+    numpy.random.seed(seed=1)
+    
+    if len(df) < 100:
+        print('Warning: When there are less than 100 observations, random coins may be unreliable')
+    
     for df_col in df.columns:
         if not (df[df_col].isin([1,0]).all):
             raise ValueError('Vriables must be binary')
-    
+
+    # df['50_coin'] = numpy.random.normal(.5, .00005, size=len(df))
+    # df['50_coin'] = round(df['50_coin'])
+            
+    df['srtr'] = numpy.random.randint(1, 101, size=len(df))
+    for coin in coins:
+        new_col_name = str(coin) + 'coin'
+        df[new_col_name] = numpy.where(df['srtr'] < coin, 1, 0)
+    del df['srtr']
+        
     grand_list = [['TestedPos', 'TestedNeg', 'TestedTot',
                 'TruePos', 'TrueNeg', 'FalesPos', 'FalseNeg',
                 'Sensitivity', 'Specificity',
@@ -24,10 +39,11 @@ def conrpt(df):
                 'ROCArea', 'F1Score', 'MattCorCoef']]
     for df_col in df.columns:
         grand_list.append(return_column(df[df.columns[0]], df[df_col]))
-    
+
     grand_columns = ['Results']
     for item in df.columns:
         grand_columns.append(item)
+    grand_columns[1] = 'Perfect'
 
     grand_frame = pandas.DataFrame(grand_list)
     grand_frame = grand_frame.transpose()
@@ -95,3 +111,18 @@ def return_column(rvar, tvar):
               FalsePosRt, FalseNegRt,CorrectRt, IncorrectRt, 
               ROCArea, F1Score, MattCorCoef]
     return(column)
+
+def display_keywords():
+    keywords = '''
+    Keywords, Terminology, & Calculations - Quick References
+
+    Prevalence  = ObservedPos/ObservedTot
+    Specificity = TrueNeg/ObservedNeg           Sensitivity = TruePos/ObservedPos
+    PosPredVal  = TruePos/(TruePos+FalsePos)    NegPredVal  = TrueNeg/(TrueNeg+FalseNeg)
+    FalsePosRt  = FalsePos/ObservedNeg          FalseNegRt  = FalseNeg/(FalseNeg+TruePos)
+    CorrectRt   = (TruePos+TrueNeg)/TestedTot   IncorrectRt = (FalsePos+FalseNeg)/TestedTot
+
+    FalsePos    = Type I Error                  FalseNeg    = Type II Error
+    FalsePosRt  = Inverse Specificity           FalseNegRt  = Inverse Sensitivity'''
+    print(keywords)
+
