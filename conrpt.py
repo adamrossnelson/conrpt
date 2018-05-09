@@ -17,6 +17,17 @@ def conrpt(df, coins=[25,50,75]):
     if len(df) < 100:
         print('Warning: When there are less than 100 observations, random coins may be unreliable')
     
+    # Count number of observed positive
+    ObservedPos = sum(df[df.columns[0]])
+    # Count number of observed negative
+    ObservedNeg = len(df[df.columns[0]]) - sum(df[df.columns[0]])
+    # Count number of total observations
+    ObservedTot = len(df[df.columns[0]])
+    # Calculate prevelance
+    ObservedPrev = format((ObservedPos / ObservedTot) * 100, '.3f')
+    print('{}Notes: ObservedPos: {}, ObservedNeg: {}, & ObservedTot: {}, Prevalence: {}'.format(
+        '\n', ObservedPos, ObservedNeg, ObservedTot, ObservedPrev))
+    
     for df_col in df.columns:
         if not (df[df_col].isin([1,0]).all):
             raise ValueError('Vriables must be binary')
@@ -48,9 +59,15 @@ def conrpt(df, coins=[25,50,75]):
     grand_frame = pandas.DataFrame(grand_list)
     grand_frame = grand_frame.transpose()
     grand_frame.columns = grand_columns
+    
+    for coin in coins:
+        new_col_name = str(coin) + 'coin'
+        del df[new_col_name]
+    
     return grand_frame
 
 def return_column(rvar, tvar):
+    from sklearn.metrics import roc_auc_score
     from pandas import DataFrame
     import pandas
     import math
@@ -65,7 +82,7 @@ def return_column(rvar, tvar):
     # Count number of observed negative
     ObservedNeg = len(rvar) - sum(rvar)
     # Count number of total observations
-    ObseredTot = len(rvar)
+    ObservedTot = len(rvar)
     # Count number that tested positive
     TestedPos = sum(tvar)
     # Count number that tested negative
@@ -81,29 +98,29 @@ def return_column(rvar, tvar):
     # Count false negative
     FalseNeg = df_xtab.ix[0][1]
     # Calculate sensitivity
-    Sensitivity = TruePos / ObservedPos
+    Sensitivity = format(TruePos / ObservedPos, '.3f')
     # Calculate specitivity
-    Specitivity = TrueNeg / ObservedNeg
+    Specitivity = format(TrueNeg / ObservedNeg, '.3f')
     # Calculate positive predictive value
-    PosPredVal = TruePos / (TruePos + FalsePos)
+    PosPredVal = format(TruePos / (TruePos + FalsePos), '.3f')
     # Calculate negative predictive value
-    NegPredVal = TrueNeg / (TrueNeg + FalseNeg)
+    NegPredVal = format(TrueNeg / (TrueNeg + FalseNeg), '.3f')
     # Calculate false positive rate
-    FalsePosRt = FalsePos / ObservedNeg
+    FalsePosRt = format(FalsePos / ObservedNeg, '.3f')
     # Calculate false negative rate
-    FalseNegRt = FalseNeg / (FalseNeg + TruePos)
+    FalseNegRt = format(FalseNeg / (FalseNeg + TruePos), '.3f')
     # Calculate correct rate
-    CorrectRt = (TruePos + TrueNeg) / TestedTot
+    CorrectRt = format((TruePos + TrueNeg) / TestedTot, '.3f')
     # Calculate incorrect rate
-    IncorrectRt = (FalsePos + FalseNeg) / TestedTot
+    IncorrectRt = format((FalsePos + FalseNeg) / TestedTot, '.3f')
     # Calculate ROC area
-    ROCArea = 0
+    ROCArea = format(roc_auc_score(rvar, tvar), '.3f')
     # Calculate f1 Score
-    F1Score = (2 * TruePos / (2 * TruePos + FalsePos + FalseNeg))
+    F1Score = format((2 * TruePos / (2 * TruePos + FalsePos + FalseNeg)), '.3f')
     # Calculate Matthes corr coefficient
-    MattCorCoef = (((TruePos * TrueNeg) - (FalsePos * FalseNeg)) / 
+    MattCorCoef = format((((TruePos * TrueNeg) - (FalsePos * FalseNeg)) / 
         math.sqrt((TruePos + FalsePos) * (TruePos + FalseNeg) * 
-        (TrueNeg + FalsePos) * (TrueNeg + FalseNeg)))
+        (TrueNeg + FalsePos) * (TrueNeg + FalseNeg))), '.3f')
     
     column = [int(TestedPos), int(TestedNeg), int(TestedTot), 
               int(TruePos), int(TrueNeg), int(FalsePos), int(FalseNeg), 
