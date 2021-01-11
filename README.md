@@ -1,9 +1,7 @@
 ## Introduction
 
 Stata package that provides confusion matrix statistics.
-
-This package was inspired by discussions on statalist.org. See for example:
-
+A discussion on statalist.org inspired this package:
 [https://www.statalist.org/for...classtabi-now-available-for-download-from-ssc](https://www.statalist.org/forums/forum/general-stata-discussion/general/1321572-a-new-command-classtabi-now-available-for-download-from-ssc)
 
 ## Installation
